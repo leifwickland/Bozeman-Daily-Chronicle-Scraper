@@ -34,7 +34,7 @@ public class BdcScraper {
                 Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want the Chronicle's state coverage.", title, link);
                 continue;
             }
-            if (link.Contains("/news/image_")) {
+            if (link.Contains("/image_")) {
                 Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want entries that are just images.", title, link);
                 continue;
             }
