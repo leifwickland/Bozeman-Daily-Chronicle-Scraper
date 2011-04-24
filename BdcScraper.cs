@@ -30,6 +30,10 @@ public class BdcScraper {
         foreach (XmlNode item in items) {
             string link = item.SelectSingleNode("link").InnerText;
             string title = item.SelectSingleNode("title").InnerText;
+            if (!link.EndsWith(".html")) {
+                Console.WriteLine("Ignoring '{0}' from '{1}' since I only want HTML.", title, link);
+                continue;
+            }
             if (link.Contains("/news/state/")) {
                 Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want the Chronicle's state coverage.", title, link);
                 continue;
@@ -115,11 +119,16 @@ public class BdcScraper {
                     }
                     break;
                 case ParseState.LookingForEnd:
-                    if (line.Contains("blox-comments") || line.Contains("<!-- begin comment tabs") || line.Contains("<!-- bottom html") || line.Contains("story-tools-sprite")) {
+                    if (line.Contains("-- begin comment tabs --") || line.Contains("blox-comments") || line.Contains("<!-- begin comment tabs") || line.Contains("<!-- bottom html") || line.Contains("story-tools-sprite")) {
                         return body.ToString();
                     }
                     if (line.Contains("<script")) {
-                        state = ParseState.SkippingScript;
+                        if (line.Contains("</script")) {
+                            state = ParseState.LookingForEnd;
+                        }
+                        else {
+                            state = ParseState.SkippingScript;
+                        }
                         break;
                     }
                     AddLine(line, body);
