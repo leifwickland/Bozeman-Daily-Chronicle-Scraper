@@ -20,7 +20,6 @@ public class BdcScraper {
         var mailServer = args[3];
 
         PastArticles pastArticles = new PastArticles(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase));
-        //var rssUrl = "http://www.bozemandailychronicle.com/search/?q=&t=article&l=10&d=&d1=&d2=&s=start_time&sd=desc&c[]=news&f=rss";
         Console.WriteLine("Requesting index from " + rssUrl);
         var rss = GetUrl(rssUrl);
         XmlDocument xml = new XmlDocument();
@@ -38,8 +37,8 @@ public class BdcScraper {
                 Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want the Chronicle's state coverage.", title, link);
                 continue;
             }
-            if (link.Contains("/image_")) {
-                Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want entries that are just images.", title, link);
+            if (link.Contains("/youtube_") || link.Contains("/image_")) {
+                Console.WriteLine("Ignoring '{0}' from '{1}' since I don't want entries that are just images or videos.", title, link);
                 continue;
             }
             if (!pastArticles.IsNew(link)) {
