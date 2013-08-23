@@ -23,7 +23,7 @@ public class BdcScraper {
     Console.WriteLine("Requesting index from " + rssUrl);
     var rss = GetUrl(rssUrl);
     XmlDocument xml = new XmlDocument();
-    xml.LoadXml(WhackBadEntities(rss));
+    xml.LoadXml(WhackBadEntities(RemoveBadControlCharacters(rss)));
     XmlNodeList items = xml.SelectNodes("//item");
     Console.WriteLine("Found " + items.Count + " possible articles.");
     foreach (XmlNode item in items) {
@@ -67,6 +67,10 @@ public class BdcScraper {
   private static void PrintUsage() {
     Console.WriteLine("USAGE <rssUrl> <toEmailAddresses> <fromEmailAddress> <mailServer>");
     Console.WriteLine("");
+  }
+
+  private static string RemoveBadControlCharacters(string xml) {
+    return Regex.Replace(xml, @"[\x00-\x08\x0B\x0C\x0E-\x1F]", "");
   }
 
   private static string WhackBadEntities(string xml) {
