@@ -23,7 +23,7 @@ public class BdcScraper {
     Console.WriteLine("Requesting index from " + rssUrl);
     var rss = GetUrl(rssUrl);
     XmlDocument xml = new XmlDocument();
-    xml.LoadXml(WhackBadEntities(RemoveBadControlCharacters(rss)));
+    xml.LoadXml(WhackGeoRss(WhackBadEntities(RemoveBadControlCharacters(rss))));
     XmlNodeList items = xml.SelectNodes("//item");
     Console.WriteLine("Found " + items.Count + " possible articles.");
     foreach (XmlNode item in items) {
@@ -71,6 +71,11 @@ public class BdcScraper {
 
   private static string RemoveBadControlCharacters(string xml) {
     return Regex.Replace(xml, @"[\x00-\x08\x0B\x0C\x0E-\x1F]", "");
+  }
+
+  // The feed included georss namespaced tags without a declaration of of the namespace, which made the parser sad.
+  private static string WhackGeoRss(string xml) {
+    return Regex.Replace(xml, @"(</?)georss:([^>]+>)", @"$1$2");
   }
 
   private static string WhackBadEntities(string xml) {
