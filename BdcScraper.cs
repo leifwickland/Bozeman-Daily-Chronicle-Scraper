@@ -111,9 +111,9 @@ public class BdcScraper {
 
   private enum ParseState {
     LookingForImages,
-    LookingForGalleryOrHeadline,
+    LookingForGalleryOrByline,
     ReadingGallery,
-    ReadingHeadline,
+    ReadingByline,
     LookingForContent,
     LookingForContentEnd,
     LookingForEncrypted,
@@ -155,15 +155,15 @@ public class BdcScraper {
   }
 
   private static string ExtractStoryBodyFrom(string page, string url) {
-    Transition(ParseState.LookingForGalleryOrHeadline, "BeginningOfStory");
+    Transition(ParseState.LookingForGalleryOrByline, "BeginningOfStory");
     StringBuilder body = new StringBuilder();
     using (StringReader reader = new StringReader(page)) {
       string line;
       while ((line = reader.ReadLine()) != null) {
         switch (state) {
-        case ParseState.LookingForGalleryOrHeadline:
-          if (line.Contains("-- AP Bookmark --")) {
-            Transition(ParseState.ReadingHeadline, line);
+        case ParseState.LookingForGalleryOrByline:
+          if (line.Contains("class=\"byline\"")) {
+            Transition(ParseState.ReadingByline, line);
           } else if (line.Contains("class=\"instant-gallery\"")) {
             Transition(ParseState.ReadingGallery, line);
           }
@@ -171,14 +171,14 @@ public class BdcScraper {
         case ParseState.ReadingGallery:
           if (line.Contains("class=\"preview-slide-navigator\"")) {
             AddLine("<br><br>", body);
-            Transition(ParseState.LookingForGalleryOrHeadline, line);
+            Transition(ParseState.LookingForGalleryOrByline, line);
           } else if (line.Contains("<img")) {
             AddLine(line, body);
           }
           break;
-        case ParseState.ReadingHeadline:
+        case ParseState.ReadingByline:
           AddLine(line, body);
-          if(line.Contains("class=\"author ")) {
+          if (line.Contains("class=\"author ") || line.Contains("id=\"blox-story-text\"")) {
             AddLine("<br><br>", body);
             Transition(ParseState.LookingForContent, line);
           }
@@ -189,7 +189,7 @@ public class BdcScraper {
           }
           break;
         case ParseState.LookingForContentEnd:
-          if (line.Contains("tncms-restricted-notice") || line.Contains("subscription-notice")) {
+          if (line.Contains("tncms-restricted-notice") || line.Contains("subscription-notice") || line.Contains("<!-- (END) Pagination Content Wrapper -->")) {
             Transition(ParseState.LookingForEncrypted, line);
           } else {
             AddLine(line, body);
