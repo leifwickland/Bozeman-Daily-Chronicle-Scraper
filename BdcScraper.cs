@@ -127,10 +127,12 @@ public class BdcScraper {
   }
 
   private static string DecryptLine(string line) {
-    string unescaped = line.Trim().Replace("&gt;", ">").Replace("&lt;", "<").Replace("&amp;", "&").Replace("&quot;", "\"");
-    if (!unescaped.StartsWith("k")) {
-      return ("<p><b>Couldn't figure out how to decrypt: " + line + "</b></p>");
-    }
+    string unescaped = line.
+      Trim().
+      Replace("&gt;", ">").
+      Replace("&lt;", "<").
+      Replace("&amp;", "&").
+      Replace("&quot;", "\"");
     StringBuilder b = new StringBuilder();
     foreach (char c in unescaped) {
       if (c < '!' || c > '~') {
@@ -212,7 +214,8 @@ public class BdcScraper {
     }
     string capturedBody = body.ToString();
     if (capturedBody.Length < 100) {
-      throw new Exception("Didn't parse correctly: " + url + " " + state + "\n" + page);
+      return "<h1>Parse failure while scraping</h1><br>Failed to parse the page at <a href=\"{0}\">{1}</a>.  Parsing failed while in the {2} state.".format(url, url, state);
+      //throw new Exception("Didn't parse correctly: " + url + " " + state + "\n" + page);
     }
     return capturedBody;
   }
