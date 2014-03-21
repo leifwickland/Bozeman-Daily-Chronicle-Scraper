@@ -127,7 +127,7 @@ public class BdcScraper {
   }
 
   private static string DecryptLine(string line) {
-    string unescaped = line.Trim().Replace("&gt;", ">").Replace("&lt;", "<").Replace("&amp;", "&");
+    string unescaped = line.Trim().Replace("&gt;", ">").Replace("&lt;", "<").Replace("&amp;", "&").Replace("&quot;", "\"");
     if (!unescaped.StartsWith("k")) {
       return ("<p><b>Couldn't figure out how to decrypt: " + line + "</b></p>");
     }
