@@ -214,7 +214,7 @@ public class BdcScraper {
     }
     string capturedBody = body.ToString();
     if (capturedBody.Length < 100) {
-      return "<h1>Parse failure while scraping</h1><br>Failed to parse the page at <a href=\"{0}\">{1}</a>.  Parsing failed while in the {2} state.".format(url, url, state);
+      return string.Format("<h1>Parse failure while scraping</h1><br>Failed to parse the page at <a href=\"{0}\">{1}</a>.  Parsing failed while in the {2} state.");
       //throw new Exception("Didn't parse correctly: " + url + " " + state + "\n" + page);
     }
     return capturedBody;
