@@ -86,11 +86,22 @@ public class BdcScraper {
     return s.Replace("&#036;", "$").Replace("&#36;", "$").Replace("&#8217;", "'").Replace("&#8220;", "\"").Replace("&#8221;", "\"").Replace("&rsquo;", "'").Replace("&lsquo;", "'");
   }
 
+  private static TimeSpan delayBetweenHttpRequests = new TimeSpan(0, 0, 3);
+  private static DateTime lastHttpRequestTime = DateTime.MinValue;
+
   private static string GetUrl(string url) {
-    WebRequest request = WebRequest.Create(url);
+    while (lastHttpRequestTime + delayBetweenHttpRequests > DateTime.UtcNow) {
+      Console.WriteLine("We need to wait until {0} for our next HTTP request.", lastHttpRequestTime + delayBetweenHttpRequests);
+      System.Threading.Thread.Sleep(1000);
+    }
+    HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
+    request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36";
     Stream output = request.GetResponse().GetResponseStream();
-    string page = new StreamReader(output).ReadToEnd();
-    return page;
+    using (StreamReader reader = new StreamReader(output)) {
+      string page = reader.ReadToEnd();
+      lastHttpRequestTime = DateTime.UtcNow;
+      return page;
+    }
   }
 
   private static Story GetStory(string url, string headline) {
