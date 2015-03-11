@@ -133,6 +133,8 @@ public class BdcScraper {
 
   private static void AddLine(string line, StringBuilder body) {
     line = Regex.Replace(line, "&#822[01]([^;])", delegate(Match match) { return match.Groups[1].Value; }).Trim();
+    // My ISP detects the messages as spam if they contain a link with this URL shortener:
+    line = Regex.Replace(line, "<a [^>]+bdcne[.]ws[^>]+>[^<]+</a[^>]*>", "LINK REMOVED");
     Console.WriteLine("    In state " + state + " adding line: " + line);
     body.AppendLine(line);
   }
